@@ -1,0 +1,47 @@
+<div class='event'>
+    <h4>$event[title]</h4>
+    <table>
+        <tr>
+            <td>Track</td>
+            <td>Class</td>
+        </tr>
+        <tr>
+            <td>$trackDict[track]</td>
+            <td>$classDict[class]</td>
+        </tr>
+    </table>
+    <span>Slots: $event[slots]</span>
+    <span>Duration: $event[duration] min</span>
+    <span>Race starts at $event[start]</span>
+    <form action='profile.php' method='post'>
+        <input type='button' value='Exit event' class='submit exit'>
+    </form>
+    <input type="button" class='deleteEvent' value="Delete event">
+</div>
+
+<div class='event'>
+    <h4>$event[title]</h4>
+    <table>
+        <tr>
+            <td>Track</td>
+            <td>Class</td>
+        </tr>
+        <tr>
+            <td>$trackDict[track]</td>
+            <td>$classDict[class]</td>
+        </tr>
+    </table>
+    <span>Slots: $event[slots]</span>
+    <span>Duration: $event[duration] min</span>
+    <span>Race starts at $event[start]</span>
+    <form action='profile.php' method='post'>
+        <input type='button' value='Exit event' class='submit exit'>
+    </form>
+</div>
+
+<!--ERRORS-->
+<div class="background glass" id="errors">
+    <span>Wrong login or password</span>
+    <span>This login has already been taken</span>
+    <span>Passwords are not matched</span>
+</div>
