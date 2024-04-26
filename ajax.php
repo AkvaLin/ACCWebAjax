@@ -137,9 +137,12 @@ if (isset($_GET['getEvents'])) {
 
 if (isset($_POST['deleteEvent'])) {
     $eventIdToDelete = intval($_POST['deleteEvent']);
+    $title = mysqli_query($sql, "SELECT title FROM Events WHERE id=$eventIdToDelete");
+    $title = mysqli_fetch_assoc($title);
+    $title = $title['title'];
     $result = mysqli_query($sql, "DELETE FROM Events WHERE id=$eventIdToDelete");
     if ($result) {
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'title' => $title]);
     } else {
         echo json_encode(["success" => false]);
     }
@@ -260,21 +263,36 @@ if (isset($_POST['lgn']) && isset($_POST['pswd'])) {
 
 if (isset($_POST['classesToDelete'])) {
     $classesToDelete = $_POST['classesToDelete'];
+    $titles = [];
     foreach ($classesToDelete as $class) {
+        $title = mysqli_query($sql, "SELECT class FROM Classes WHERE id='$class'");
+        $title = mysqli_fetch_assoc($title);
+        array_push($titles, $title['class']);
         mysqli_query($sql, "DELETE FROM Classes WHERE id=$class");
     }
+    echo json_encode(["success" => true, 'titles' => $titles]);
 }
 if (isset($_POST['tracksToDelete'])) {
     $tracksToDelete = $_POST['tracksToDelete'];
+    $titles = [];
     foreach ($tracksToDelete as $track) {
+        $title = mysqli_query($sql, "SELECT track FROM Tracks WHERE id='$track'");
+        $title = mysqli_fetch_assoc($title);
+        array_push($titles, $title['track']);
         mysqli_query($sql, "DELETE FROM Tracks WHERE id=$track");
     }
+    echo json_encode(["success" => true, 'titles' => $titles]);
 }
 if (isset($_POST['tireToDelete'])) {
     $pressureToDelete = $_POST['tireToDelete'];
+    $titles = [];
     foreach ($pressureToDelete as $tire) {
+        $title = mysqli_query($sql, "SELECT class FROM TirePressure WHERE id='$tire'");
+        $title = mysqli_fetch_assoc($title);
+        array_push($titles, $title['class']);
         mysqli_query($sql, "DELETE FROM TirePressure WHERE id=$tire");
     }
+    echo json_encode(["success" => true, 'titles' => $titles]);
 }
 if (isset($_POST['admin'])) {
     $admin = $_POST['admin'];
@@ -292,7 +310,7 @@ if (isset($_POST['newClass'])) {
     $result = mysqli_query($sql, "INSERT INTO Classes VALUES (default, '$newClass')");
 
     if ($result) {
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => true, 'class' => $newClass]);
     } else {
         echo json_encode(["success" => false]);
     }
@@ -302,7 +320,7 @@ if (isset($_POST['newTrack'])) {
     $result = mysqli_query($sql, "INSERT INTO Tracks VALUES (default, '$newTrack')");
 
     if ($result) {
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => true, 'track' => $newTrack]);
     } else {
         echo json_encode(["success" => false]);
     }
@@ -317,15 +335,23 @@ if (isset($_POST['pressureClass']) && isset($_POST['fmi']) && isset($_POST['fma'
 
     if (isset($_POST['updateTire'])) {
         $pressureToUpdate = $_POST['updateTire'];
+        $previousTire = mysqli_query($sql, "SELECT * FROM TirePressure WHERE id=$pressureToUpdate");
+        $previousTire = mysqli_fetch_assoc($previousTire);
         $result = mysqli_query($sql, "UPDATE TirePressure SET class='$classPres', frontMin='$fmi', frontMax='$fma', rearMin='$rmi', rearMax='$rma' WHERE id=$pressureToUpdate");
+        $newTire = mysqli_query($sql, "SELECT * FROM TirePressure WHERE id=$pressureToUpdate");
+        $newTire = mysqli_fetch_assoc($newTire);
+        if ($result) {
+            echo json_encode(["success" => true, 'newTire' => $newTire, 'previousTire' => $previousTire]);
+        } else {
+            echo json_encode(["success" => false]);
+        }
     } else {
         $result = mysqli_query($sql, "INSERT INTO TirePressure VALUES (default, '$classPres', '$fmi', '$fma', '$rmi', '$rma')");
-    }
-
-    if ($result) {
-        echo json_encode(["success" => true]);
-    } else {
-        echo json_encode(["success" => false]);
+        if ($result) {
+            echo json_encode(["success" => true, 'class' => $classPres, 'fmi' => $fmi, 'fma' => $fma, 'rma' => $rma, 'rmi' => $rmi]);
+        } else {
+            echo json_encode(["success" => false]);
+        }
     }
 }
 

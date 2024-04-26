@@ -39,7 +39,7 @@
                 <input type='text' name='newClass' placeholder='New class name' id="addClassTextField">
             </div>
             <div>
-                <input type='button' value='Delete selected' class="inputButton submit">
+                <input type='button' value='Delete selected' class="inputButton submit" id="deleteClassesButton">
             </div>
             <div>
                 <input type='button' value='Add class' class="inputButton submit" id="addClassButton">
@@ -68,7 +68,7 @@
                 <input type='text' name='newTrack' placeholder='New track name' id="addTrackTextField">
             </div>
             <div>
-                <input type='button' value='Delete selected' class="inputButton submit">
+                <input type='button' value='Delete selected' class="inputButton submit" id="deleteTracksButton">
             </div>
             <div>
                 <input type='button' value='Add track' class="inputButton submit" id="addTrackButton">
@@ -102,25 +102,27 @@
             </div>
             <div>
                 <h4>Add pressure</h4>
-                <div><input type='text' name='class' placeholder='Class name' id="addPressureClassTextField"></div>
+                <div><input type='text' name='pressureClass' placeholder='Class name' id="addPressureClassTextField"></div>
                 <div><input type='text' name='fmi' placeholder='Front min' id="addPressureFmiTextField"></div>
                 <div><input type='text' name='fma' placeholder='Front max' id="addPressureFmaTextField"></div>
                 <div><input type='text' name='rmi' placeholder='Rear min' id="addPressureRmiTextField"></div>
                 <div><input type='text' name='rma' placeholder='Rear max' id="addPressureRmaTextField"></div>
             </div>
-            <div><input type='button' value='Delete pressure' class="inputButton submit"></div>
+            <div><input type='button' value='Delete pressure' class="inputButton submit" id="deletePressureButton"></div>
             <div><input type='button' value='Add pressure' class="inputButton submit" id="addPressureButton"></div>
             <div>
                 <h4>Update pressure</h4>
-                <select name='updateTire' id="pressurePicker"></select>
-                <div><input type='text' name='class' placeholder='Class name'></div>
-                <div><input type='text' name='fmi' placeholder='Front min'></div>
-                <div><input type='text' name='fma' placeholder='Front max'></div>
-                <div><input type='text' name='rmi' placeholder='Rear min'></div>
-                <div><input type='text' name='rma' placeholder='Rear max'></div>
+                <form id="updatePressureForm">
+                    <select name='updateTire' id="pressurePicker"></select>
+                    <div><input type='text' name='pressureClass' placeholder='Class name'></div>
+                    <div><input type='text' name='fmi' placeholder='Front min'></div>
+                    <div><input type='text' name='fma' placeholder='Front max'></div>
+                    <div><input type='text' name='rmi' placeholder='Rear min'></div>
+                    <div><input type='text' name='rma' placeholder='Rear max'></div>
+                </form>
             </div>
             <div></div>
-            <div><input type='button' value='Update pressure' class="inputButton submit"></div>
+            <div><input type='button' value='Update pressure' class="inputButton submit" id="updatePressureButton"></div>
             <div></div>
             <hr class="roundedExtended"><hr class="rounded">
 
@@ -140,7 +142,24 @@
                 </div>
             </div>
             <div><input type='button' value='Add admin' class="inputButton submit" id="addAdminButton"></div>
-            <div><input type='button' value='Remove admin' class="inputButton submit"></div>
+            <div><input type='button' value='Remove admin' class="inputButton submit" id="deleteAdminButton"></div>
+
+            <!--            Deleted-->
+
+            <hr class="roundedExtended"><hr class="rounded">
+            <h1>Deleted</h1>
+            <div></div>
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <td rowspan='2'>Type</td>
+                        <td rowspan='2'>Title</td>
+                    </tr>
+                    </thead>
+                    <tbody id="deletedBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 

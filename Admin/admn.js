@@ -7,6 +7,7 @@ let tracksBody
 let pressureBody
 let pressurePicker
 let admins
+let deletedBody
 
 $(document).ready(function () {
     adminPanel = $('.adminPanel')
@@ -16,6 +17,7 @@ $(document).ready(function () {
     pressureBody = $('#pressureBody')
     pressurePicker = $('#pressurePicker')
     admins = $('#admins')
+    deletedBody = $('#deletedBody')
 
     let signInButton = $('#signIn')
     let loginTextField = $('input[name="lgn"]')
@@ -38,6 +40,14 @@ $(document).ready(function () {
     let addAdminLoginTextField = $('#addAdminLoginTextField')
     let addAdminPasswordTextField = $('#addAdminPasswordTextField')
     let addAdminButton  = $('#addAdminButton')
+
+    let deleteClassesButton = $('#deleteClassesButton')
+    let deleteTracksButton = $('#deleteTracksButton')
+    let deletePressureButton = $('#deletePressureButton')
+    let deleteAdminButton = $('#deleteAdminButton')
+
+    let updatePressureButton = $('#updatePressureButton')
+    let updatePressureForm = $('#updatePressureForm')
 
     signInButton.click(function () {
         let login = loginTextField.val()
@@ -96,6 +106,45 @@ $(document).ready(function () {
         } else {
             alert('Fill in all fields')
         }
+    })
+
+    deleteClassesButton.click(function () {
+        let deleteClassesRows = $('input[name=classToDelete]:checked')
+        let classesToDelete = []
+        deleteClassesRows.each(function (index, row) {
+            classesToDelete.push($(row).val())
+        })
+        deleteClasses(classesToDelete)
+    })
+
+    deleteTracksButton.click(function () {
+        let deleteTracksRows = $('input[name=trackToDelete]:checked')
+        let tracksToDelete = []
+        deleteTracksRows.each(function (index, row) {
+            tracksToDelete.push($(row).val())
+        })
+        deleteTracks(tracksToDelete)
+    })
+
+    deletePressureButton.click(function () {
+        let deletePressureRows = $('input[name=tireToDelete]:checked')
+        let pressureToDelete = []
+        deletePressureRows.each(function (index, row) {
+            pressureToDelete.push($(row).val())
+        })
+        deletePressure(pressureToDelete)
+    })
+
+    deleteAdminButton.click(function () {
+        deleteAdmin(admins.val())
+    })
+
+    updatePressureButton.click(function () {
+        let data = updatePressureForm.serializeArray().reduce(function(obj, item) {
+            obj[item.name] = item.value
+            return obj
+        }, {})
+        updatePressure(data)
     })
 
     adminPanel.hide()
@@ -200,7 +249,7 @@ function getTrackData() {
     })
 }
 
-function getPressureData() {
+function getPressureData(update) {
     $.ajax({
         url: ajaxUrl,
         method: 'POST',
@@ -219,6 +268,9 @@ function getPressureData() {
                             .html(pressure['class'])
                     )
                 })
+                if (update) {
+                    update()
+                }
             } else {
                 alert('Cannot fetch pressure data')
             }
@@ -257,7 +309,7 @@ function addClass(name) {
         data: {newClass: name},
         success: function (response) {
             if (response['success']) {
-                alert('New class has added')
+                alert(`New class has added (${response['class']})`)
                 getClassData()
             } else {
                 alert('Failed to add new class')
@@ -274,7 +326,7 @@ function addTrack(name) {
         data: {newTrack: name},
         success: function (response) {
             if (response['success']) {
-                alert('New track has added')
+                alert(`New track has added (${response['track']})`)
                 getTrackData()
             } else {
                 alert('Failed to add new track')
@@ -297,7 +349,7 @@ function addPressure(pressureClass, fmi, fma, rmi, rma) {
         },
         success: function (response) {
             if (response['success']) {
-                alert('New pressure has added')
+                alert(`New pressure has added (${response['class']}, ${response['fmi']}, ${response['fma']}, ${response['rmi']}, ${response['rma']})`)
                 getPressureData()
             } else {
                 alert('Failed to add new pressure')
@@ -326,6 +378,138 @@ function addAdmins(login, password) {
     })
 }
 
+function deleteClasses(classesToDelete) {
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            classesToDelete: classesToDelete
+        },
+        success: function (response) {
+            if (response['success']) {
+                getClassData()
+                response['titles'].forEach((title) => {
+                    deletedBody.append(
+                        $('<tr>')
+                            .append(
+                                $('<td>')
+                                    .html('Class')
+                            )
+                            .append(
+                                $('<td>')
+                                    .html(title)
+                            )
+                    )
+                })
+            }
+        }
+    })
+}
+
+function deleteTracks(tracksToDelete) {
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            tracksToDelete: tracksToDelete
+        },
+        success: function (response) {
+            if (response['success']) {
+                getTrackData()
+                response['titles'].forEach((title) => {
+                    deletedBody.append(
+                        $('<tr>')
+                            .append(
+                                $('<td>')
+                                    .html('Track')
+                            )
+                            .append(
+                                $('<td>')
+                                    .html(title)
+                            )
+                    )
+                })
+            }
+        }
+    })
+}
+
+function deletePressure(pressureToDelete) {
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            tireToDelete: pressureToDelete
+        },
+        success: function (response) {
+            if (response['success']) {
+                getPressureData()
+                response['titles'].forEach((title) => {
+                    deletedBody.append(
+                        $('<tr>')
+                            .append(
+                                $('<td>')
+                                    .html('Pressure')
+                            )
+                            .append(
+                                $('<td>')
+                                    .html(title)
+                            )
+                    )
+                })
+            }
+        }
+    })
+}
+
+function deleteAdmin(adminId) {
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            admin: adminId
+        },
+        success: function (response) {
+            if (response['success']) {
+                getAdminData()
+            }
+        }
+    })
+}
+
+function updatePressure(data) {
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: data,
+        success: function (response) {
+            if (response['success']) {
+                getPressureData(() => {
+                    let newTire = response['newTire']
+                    let previousTire = response['previousTire']
+
+                    let data = {
+                        id: newTire['id'],
+                        class: `${newTire['class']} (${previousTire['class']})`,
+                        frontMin: `${newTire['frontMin']} (${previousTire['frontMin']})`,
+                        frontMax: `${newTire['frontMax']} (${previousTire['frontMax']})`,
+                        rearMin: `${newTire['rearMin']} (${previousTire['rearMin']})`,
+                        rearMax: `${newTire['rearMax']} (${previousTire['rearMax']})`
+                    }
+
+                    $(`.tire_${newTire['id']}`)
+                        .html(buildPressureRow(data).html())
+                })
+            }
+        }
+    })
+}
+
 function buildRow(data, type) {
     return $('<tr>')
         .append(
@@ -336,7 +520,7 @@ function buildRow(data, type) {
                         .append(
                             $('<input>')
                                 .attr('type', 'checkbox')
-                                .attr('name', `${type}ToDelete[]`)
+                                .attr('name', `${type}ToDelete`)
                                 .val(data['id'])
                         )
                 )
@@ -345,7 +529,7 @@ function buildRow(data, type) {
             $('<td>')
                 .append(
                     $('<div>')
-                        .addClass('tableItem')
+                        .addClass('tableItem tableItemId')
                         .html(data['id'])
                 )
         )
@@ -361,6 +545,7 @@ function buildRow(data, type) {
 
 function buildPressureRow(pressureData) {
     return $('<tr>')
+        .addClass(`tire_${pressureData['id']}`)
         .append(
             $('<td>')
                 .append(
@@ -369,7 +554,7 @@ function buildPressureRow(pressureData) {
                         .append(
                             $('<input>')
                                 .attr('type', 'checkbox')
-                                .attr('name', `$tireToDelete[]`)
+                                .attr('name', `tireToDelete`)
                                 .val(pressureData['id'])
                         )
                 )
